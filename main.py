@@ -5,6 +5,8 @@ from discord.ext import commands
 
 import requests
 
+import config
+from DatabaseHelper import DatabaseHelper
 from config import API_KEY, BOT_TOKEN
 
 intents = discord.Intents.default()
@@ -12,6 +14,8 @@ intents.typing = False
 intents.presences = False
 
 bot = commands.Bot(command_prefix='!', intents=intents)
+helper = DatabaseHelper(config.SERVER_HOST, config.SERVER_USER, config.SERVER_PASS, config.SERVER_DB)
+helper.connect()
 
 @bot.event
 async def on_ready():
@@ -36,6 +40,8 @@ async def on_message(message):
             await message.channel.send("It is currently" + " " + str(current_temp) + " " + "and " + current_condition_text + " " + "in " + location_name)
 
 def process_request(param):
+
+
     response = requests.get('http://api.weatherapi.com/v1/current.json?key=' + API_KEY + '&q=' + str(param) + '&aqi=no')
 
     if response.status_code == 200:
