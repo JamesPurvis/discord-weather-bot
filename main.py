@@ -21,8 +21,14 @@ async def on_ready():
 @bot.event
 async def on_message(message):
         if message.content.startswith("!weather"):
-            param = message.content.split(' ')
-            json_data = process_request(param[1])
+
+            if "," in message.content:
+                param = message.content.split(" ")
+                json_data = process_request(param[1])
+            else:
+                param = message.content.split(" ")
+                json_data = process_request(param[1])
+
             location_name = json_data["location"]["name"]
             current_temp = json_data["current"]["temp_f"]
             current_condition_text = json_data["current"]["condition"]["text"]
