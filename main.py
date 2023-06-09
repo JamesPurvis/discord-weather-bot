@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import discord
@@ -22,22 +23,28 @@ async def on_ready():
     print(f'Logged in as {bot.user.name} ({bot.user.id})')
 
 
-@bot.event
-async def on_message(message):
-        if message.content.startswith("!weather"):
+@bot.command()
+async def weather(ctx):
+    results = helper.execute_query("SELECT * FROM user_locations WHERE username = %s", (ctx.author.name,))
 
-            if "," in message.content:
-                param = message.content.split(" ")
-                json_data = process_request(param[1])
-            else:
-                param = message.content.split(" ")
-                json_data = process_request(param[1])
+    if results is None:
+        await ctx.author.send("I haven't saved your location yet, would you like to add it into my DB")
+    else:
+        await send_message(ctx, return_weather(ctx, results))
 
-            location_name = json_data["location"]["name"]
-            current_temp = json_data["current"]["temp_f"]
-            current_condition_text = json_data["current"]["condition"]["text"]
 
-            await message.channel.send("It is currently" + " " + str(current_temp) + " " + "and " + current_condition_text + " " + "in " + location_name)
+
+def return_weather(ctx, results):
+    location = results[2];
+    json_data = process_request(location)
+    location_name = json_data["location"]["name"]
+    current_temp = json_data["current"]["temp_f"]
+    current_condition_text = json_data["current"]["condition"]["text"]
+    return "It is currently" + " " + str(current_temp) + " " + "and " + current_condition_text + " " + "in " + location_name
+
+
+async def send_message(ctx, message):
+    await ctx.author.send(message)
 
 def process_request(param):
 
