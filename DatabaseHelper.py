@@ -28,11 +28,8 @@ class DatabaseHelper:
             results = cursor.fetchone()
             self.connection.commit()
             print("Query executed successfully.")
+            return results
 
-            if len(results) == 0:
-                return None
-            else:
-                return results
         except mysql.connector.Error as error:
             print("Error executing query:", error)
         finally:
